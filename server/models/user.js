@@ -73,15 +73,6 @@ UserSchema.methods.isValidPassword = async function(newPassword,hashPW) {
     }
 }
 
-signToken = user => {
-    const token = JWT.sign({
-    iss: 'seannguyn',
-    sub: user._id,
-    iat: new Date().getTime(),
-    // exp: new Date().getTime() + 60*60*3, // current date + 1
-    }, jwt_key )
-    return token;
-}
 // models methods
 UserSchema.methods.generateToken = async function() {
     try {

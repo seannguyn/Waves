@@ -21,18 +21,20 @@ mongoose
 // ====== MODELS
 // ============================
 const User = require('./models/user');
+const Brand = require('./models/brand');
 
 // ============================
 // ====== MIDDLEWARE
 // ============================
 const {auth} = require('./middlewares/auth');
+const {admin} = require('./middlewares/admin');
 
 // ============================
 // ====== ROUTE
 // ============================
 
 // ** USER **
-app.get('/api/user/auth',auth, (req,res) => {
+app.get('/api/user/auth', auth, (req,res) => {
     // has middleware, if user is loggedin, go to the next line of code 
     return res.status(200).json({
         user:req.user,
@@ -97,7 +99,55 @@ app.get('/api/user/logout',auth ,(req,res) => {
 })
 
 // ** BRAND **
+app.post('/api/brand', auth, admin, (req,res) => {
+
+    const brand = new Brand(req.body);
+    brand.save((error,doc) => {
+        if (error) {
+            return res.status(200).json({
+                success:"false",
+                message: error
+            })
+        }
+        else {
+            return res.status(200).json({
+                success:"true",
+                brandData: doc,
+            })
+        }
+    })
+    
+})
+
+app.get('/api/brands', (req,res) => {
+
+    const brands = Brand.find({}, (error, brands) => {
+        if (error){
+            return res.status(200).json({
+                success:"false",
+                message:error,
+            }) 
+        } else {
+            return res.status(200).json({
+                success:"true",
+                brandData:brands,
+            }) 
+        }
+    });
+    
+})
+
+app.delete('/api/brand/:id', auth, admin, (req,res) => {
+
+    Brand.findOne({_id:req.params.id})
+    .then((item) => item.remove().then(() => res.json({'success': 'true'})))
+    .catch((err) => res.status(404).json({'success': 'false',message:err}))
+    
+})
+
+
 // ** PRODUCT **
+
 // ** USER **
 app.get('/hey',(req,res)=>{
     return res.status(200).json({
