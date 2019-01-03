@@ -23,6 +23,7 @@ mongoose
 const User = require('./models/user');
 const Brand = require('./models/brand');
 const Wood = require('./models/wood');
+const Product = require('./models/product');
 
 // ============================
 // ====== MIDDLEWARE
@@ -195,28 +196,43 @@ app.delete('/api/wood/:id', auth, admin, (req,res) => {
 
 
 // ********************** PRODUCT **********************
-app.post('api/product', auth, admin,(res,req) => {
-
+app.post('/api/product', auth, admin,(req,res) => {
+    const product = new Product(req.body);
+    product.save()
+    .then((item) => {
+        return res.status(200).json({
+            success:"true",
+            productData:item,
+        });
+    })
+    .catch((error)=>{
+        return res.status(200).json({
+            success:"false",
+            message:error,
+        });
+    })
 })
 
-app.get('api/products', (res,req) => {
+app.get('/api/products', (req,res) => {
     
 })
 
-app.get('api/product/:product_id', (res,req) => {
+app.get('/api/product/:product_id', (req,res) => {
     
 })
 
-app.get('api/product/:brand_id', (res,req) => {
+app.get('/api/product/:brand_id', (req,res) => {
     
 })
 
-app.get('api/product/:wood_id', (res,req) => {
+app.get('/api/product/:wood_id', (req,res) => {
     
 })
 
-app.delete('api/product/:product_id', auth, admin, (res,req) => {
-    
+app.delete('/api/product/:product_id', auth, admin, (req,res) => {
+    Product.findOne({_id:req.params.product_id})
+    .then((item) => item.remove().then(() => res.json({'success': 'true'})))
+    .catch((err) => res.status(404).json({'success': 'false',message:err}))
 })
 
 // run port and app
