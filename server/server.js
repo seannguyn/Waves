@@ -22,6 +22,7 @@ mongoose
 // ============================
 const User = require('./models/user');
 const Brand = require('./models/brand');
+const Wood = require('./models/wood');
 
 // ============================
 // ====== MIDDLEWARE
@@ -33,7 +34,7 @@ const {admin} = require('./middlewares/admin');
 // ====== ROUTE
 // ============================
 
-// ** USER **
+// ********************** USER **********************
 app.get('/api/user/auth', auth, (req,res) => {
     // has middleware, if user is loggedin, go to the next line of code 
     return res.status(200).json({
@@ -98,7 +99,7 @@ app.get('/api/user/logout',auth ,(req,res) => {
     
 })
 
-// ** BRAND **
+// ********************** BRAND **********************
 app.post('/api/brand', auth, admin, (req,res) => {
 
     const brand = new Brand(req.body);
@@ -145,14 +146,77 @@ app.delete('/api/brand/:id', auth, admin, (req,res) => {
     
 })
 
+// ********************** WOOD **********************
+app.post('/api/wood', auth, admin, (req,res) => {
 
-// ** PRODUCT **
-
-// ** USER **
-app.get('/hey',(req,res)=>{
-    return res.status(200).json({
-        success: true,
+    const wood = new Wood(req.body);
+    wood.save((error,doc) => {
+        if (error) {
+            return res.status(200).json({
+                success:"false",
+                message: error
+            })
+        }
+        else {
+            return res.status(200).json({
+                success:"true",
+                woodData: doc,
+            })
+        }
     })
+    
+})
+
+app.get('/api/woods', (req,res) => {
+
+    const woods = Wood.find({}, (error, woods) => {
+        if (error){
+            return res.status(200).json({
+                success:"false",
+                message:error,
+            }) 
+        } else {
+            return res.status(200).json({
+                success:"true",
+                woodData:woods,
+            }) 
+        }
+    });
+    
+})
+
+app.delete('/api/wood/:id', auth, admin, (req,res) => {
+
+    Wood.findOne({_id:req.params.id})
+    .then((item) => item.remove().then(() => res.json({'success': 'true'})))
+    .catch((err) => res.status(404).json({'success': 'false',message:err}))
+    
+})
+
+
+// ********************** PRODUCT **********************
+app.post('api/product', auth, admin,(res,req) => {
+
+})
+
+app.get('api/products', (res,req) => {
+    
+})
+
+app.get('api/product/:product_id', (res,req) => {
+    
+})
+
+app.get('api/product/:brand_id', (res,req) => {
+    
+})
+
+app.get('api/product/:wood_id', (res,req) => {
+    
+})
+
+app.delete('api/product/:product_id', auth, admin, (res,req) => {
+    
 })
 
 // run port and app
