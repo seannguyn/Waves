@@ -214,19 +214,67 @@ app.post('/api/product', auth, admin,(req,res) => {
 })
 
 app.get('/api/products', (req,res) => {
-    
+    Product.find({})
+    .then((items) => res.status(200).json({'success': 'true', productData:items}))
+    .catch((err) => res.status(404).json({'success': 'false',message:err}));
 })
 
 app.get('/api/product/:product_id', (req,res) => {
-    
+    Product.findOne({_id:req.params.product_id})
+    .then((item) => res.json({'success': 'true', productData:item}))
+    .catch((err) => res.status(404).json({'success': 'false',message:err}))
 })
 
-app.get('/api/product/:brand_id', (req,res) => {
+// app.get('/api/product/:brand_id', (req,res) => {
     
+// })
+
+// app.get('/api/product/:wood_id', (req,res) => {
+    
+// })
+
+app.get('/api/products/query', (req,res) => {
+
+    let type = req.query.type;
+    var items = [];
+
+    if (type === "array") {
+        itemsId = req.query.id.split(',');
+        items = itemsId.map((item)=> {
+            return mongoose.Types.ObjectId(item)
+        });
+    } else {
+        items = [mongoose.Types.ObjectId(req.query.id)];
+    }
+
+    Product
+    .find({"_id":{$in:items}})
+    .populate("brand")
+    .populate("wood")
+    .then((items) => {res.status(200).json({success:"true",products:items})})
+    .catch((error) => {res.status(404).json({success:"false",message:error})})
+
 })
 
-app.get('/api/product/:wood_id', (req,res) => {
-    
+// BY ARRIVAL
+// /articles?sortBy=createdAt&order=desc&limit=4
+
+// BY SELL
+// /articles?sortBy=sold&order=desc&limit=100
+app.get('/api/products/otherquery',(req,res)=>{
+
+    let order = req.query.order ? req.query.order : 'asc';
+    let sortBy = req.query.sortBy ? req.query.sortBy : "_id";
+    let limit = req.query.limit ? parseInt(req.query.limit) : 100;
+
+    Product.
+    find().
+    populate('brand').
+    populate('wood').
+    sort([[sortBy,order]]).
+    limit(limit)
+    .then((items) => res.json({'success': 'true', items:items}))
+    .catch((err) => res.status(404).json({'success': 'false',message:err}))
 })
 
 app.delete('/api/product/:product_id', auth, admin, (req,res) => {
