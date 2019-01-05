@@ -70,21 +70,21 @@ app.post('/api/user/login', async (req,res) => {
             const userWithToken = await user.generateToken();
 
             return res.cookie('waves_auth',userWithToken.token).status(200).json({
-                found: true,
+                success: true,
                 user: userWithToken,
             });
 
         }else {
             return res.status(200).json({
-                found: true,
-                message:"wrong PW",
+                success: true,
+                user:"wrong PW",
             })
         }
         
     } else {
         return res.status(200).json({
-            found: false,
-            message:"user not found",
+            success: false,
+            user:"user not found",
         })
     }
 })
