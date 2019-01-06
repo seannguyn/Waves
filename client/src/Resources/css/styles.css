@@ -10,6 +10,7 @@ body {
     margin: 0 auto;
 }
 .page_container {
+    
     min-height: 75vh;
     padding-top: 85px;
 }
@@ -19,6 +20,7 @@ body {
 }
 
 .page_wrapper {
+    border: 2px solid red;
     padding-top: 85px;
 }
 
@@ -244,6 +246,7 @@ select {
             HEADER
 ==============================*/
 header {
+    
     position: fixed;
     z-index: 999;
     width: 100%;
@@ -262,10 +265,12 @@ header a {
 }
 
 header .container {
+    margin: 0 auto;
     display: flex;
 }
 
 header .container .left{
+    
     width: 250px;
 }
 

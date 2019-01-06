@@ -50,9 +50,7 @@ UserSchema.pre('save', async function(next) {
             // generate a salt
             const salt = await bcrypt.genSalt(10);
             const pwHash = await bcrypt.hash(this.password, salt);
-            console.log("salt: ",salt);
-            console.log("password: ",this.password);
-            console.log("pwHash",pwHash);
+
             this.password = pwHash;
             next();
         } catch(error) {

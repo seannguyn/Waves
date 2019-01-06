@@ -46,6 +46,10 @@ class Login extends Component {
         }
     }
 
+    // static getDerivedStateFromProps(nextProps, prevState) {
+        
+    // }   
+
     updateForm = (element) => {
         const newFormdata = update(element,this.state.formdata,'login');
         this.setState({
@@ -62,7 +66,17 @@ class Login extends Component {
 
         if(formIsValid){
 
-            this.props.loginUser(dataToSubmit);
+            // this.props.loginUser(dataToSubmit);
+            this.props.dispatch(loginUser(dataToSubmit)).then(response =>{
+                if(response.payload.success){
+                    console.log(response.payload);
+                    this.props.history.push('/user/dashboard')
+                }else{
+                    this.setState({
+                        formError: true
+                    })
+                }
+            });
 
         } else {
             this.setState({
@@ -104,8 +118,15 @@ class Login extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
-    user: state.user
-})
+// const mapStateToProps = (state) => ({
+//     user: state.user
+// })
 
-export default connect(mapStateToProps,{loginUser})(withRouter(Login));
+Login.defaultProps = {
+    success: "false",
+    user: null,
+};
+
+export default connect()(withRouter(Login));
+
+// export default connect(mapStateToProps,{loginUser})(withRouter(Login));
