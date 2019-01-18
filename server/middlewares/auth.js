@@ -13,7 +13,8 @@ let auth = async (req,res,next) => {
 
     } else {
         return res.status(200).json({
-            validToken: "false",
+            validToken: false,
+            success: false
         }) 
     }    
 }

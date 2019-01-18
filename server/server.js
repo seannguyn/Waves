@@ -38,9 +38,11 @@ const {admin} = require('./middlewares/admin');
 // ********************** USER **********************
 app.get('/api/user/auth', auth, (req,res) => {
     // has middleware, if user is loggedin, go to the next line of code 
+    
     return res.status(200).json({
-        user:req.user,
-        stuff:"cool"
+        userData: req.user,
+        success: true,
+        validToken: true,
     })
 
 })
@@ -71,20 +73,20 @@ app.post('/api/user/login', async (req,res) => {
 
             return res.cookie('waves_auth',userWithToken.token).status(200).json({
                 success: true,
-                user: userWithToken,
+                userData: userWithToken,
             });
 
         }else {
             return res.status(200).json({
-                success: true,
-                user:"wrong PW",
+                success: false,
+                userData:"wrong PW",
             })
         }
         
     } else {
         return res.status(200).json({
             success: false,
-            user:"user not found",
+            userData:"user not found",
         })
     }
 })
@@ -94,7 +96,8 @@ app.get('/api/user/logout',auth ,(req,res) => {
     User.findOneAndUpdate({_id:req.user._id},{token:""},(err,doc) => {
         if(err) return res.json({logoutSuccess:false,err});
             return res.status(200).json({
-                logoutSuccess: true
+                success: false,
+                userData:"Logout successful",
             })
     })
     

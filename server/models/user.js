@@ -94,12 +94,12 @@ UserSchema.methods.generateToken = async function() {
 
 UserSchema.statics.findByToken = async function(token) {
     try {
-        var thisUser = this;
-       
+        var thisUser = this;       
         const validUser = await JWT.verify(token, process.env.JWT_KEY,async function(err,decode){
+            
             if(err) return null;
             else {
-                const user = await thisUser.findOne({"_id":decode.sub});
+                const user = await thisUser.findOne({"token":token});
                 return user;
             }
         });
