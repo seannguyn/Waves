@@ -201,6 +201,53 @@ app.delete('/api/wood/:id', auth, admin, (req,res) => {
 // create model, create route
 
 // ********************** PRODUCT **********************
+
+app.post('/api/products/shop',(req,res) => {
+
+    let orderBy = req.body.orderBy ? req.body.orderBy : 'desc';
+    let sortBy =  req.body.sortBy ? req.body.sortBy : '_id';
+    let limit = req.body.limit ? parseInt(req.body.limit) : 100;
+    let skip = parseInt(req.body.skip);
+    let findArgs = {}
+
+    for (let args in req.body.filter) {
+        if(req.body.filter[args].length >0 ){
+            if (args === 'price') {
+                findArgs[args] = {
+                    $gte : req.body.filter[args][0],
+                    $lte : req.body.filter[args][1],
+                }
+            } else {
+                findArgs[args] =  req.body.filter[args];
+            }
+        }
+        
+    }
+
+    findArgs['publish'] = true;
+
+    Product.
+    find(findArgs).
+    populate('brand').
+    populate('wood').
+    sort([[sortBy,orderBy]]).
+    skip(skip).
+    limit(limit).
+    exec((err,products)=>{
+        
+        if(err) return res.status(200).json({
+            success: false,
+            size: 101,
+            products: []
+        })
+        res.status(200).json({
+            success: true,
+            size: products.length,
+            products: products
+        })
+    })
+})
+
 app.post('/api/product', auth, admin,(req,res) => {
     const product = new Product(req.body);
     product.save()

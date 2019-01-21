@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PageTop from './page_top';
 import {connect} from 'react-redux';
-import {getWoods, getBrands} from '../../reduxActions/productActions';
+import {getWoods, getBrands, getProductByFilter} from '../../reduxActions/productActions';
 import CollapseCheckbox from './collapse_checkbox';
 import CollapseRadio from './collapse_radio';
 import {frets,price} from '../../constant/constant';
@@ -15,8 +15,8 @@ class Shop extends Component {
             limit: 6,
             skip: 0,
             filter: {
-                woods:[],
-                brands:[],
+                wood:[],
+                brand:[],
                 frets: [],
                 price: [],
             }
@@ -24,20 +24,24 @@ class Shop extends Component {
     }
 
     componentDidMount(){
-        this.props.dispatch(getWoods())
-        this.props.dispatch(getBrands())
+        this.props.dispatch(getWoods());
+        this.props.dispatch(getBrands());
+        this.props.dispatch(getProductByFilter(this.state));
     }
     
     handleFilters(returnFilter,category) {
         const {filter} = this.state;
         const newFilter = {...filter};
         newFilter[category] = returnFilter;
+
+        
+
         this.setState({
+            skip: 0,
             filter: newFilter
         },() => {
-            console.log(this.state.filter);
+            this.props.dispatch(getProductByFilter(this.state));
         })
-        
         
     }
 
@@ -55,14 +59,14 @@ class Shop extends Component {
                                 title="Brands"
                                 list={brands.brandData}
                                 handleFilters={this.handleFilters.bind(this)}
-                                category="brands"
+                                category="brand"
                              />
                             <CollapseCheckbox 
                                 initState={true}
                                 title="Woods"
                                 list={woods.woodData}
                                 handleFilters={this.handleFilters.bind(this)}
-                                category="woods"
+                                category="wood"
                              />
                              <CollapseCheckbox 
                                 initState={true}

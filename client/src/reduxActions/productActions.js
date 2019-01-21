@@ -4,6 +4,7 @@ import {
     GET_PRODUCT_BY_SELL,
     GET_BRANDS,
     GET_WOODS,
+    GET_PRODUCT_BY_FILTER,
 } from './types';
 
 // BY ARRIVAL
@@ -29,6 +30,23 @@ export async function getProductBySell(){
     return {
         type: GET_PRODUCT_BY_SELL,
         payload: request
+    }
+}
+
+export async function getProductByFilter({skip, limit, filter}, previousState =[]) {
+    console.log("skip",skip);
+    const data = {
+        skip,
+        limit,
+        filter,
+    }
+
+    const request = await axios.post(`/api/products/shop`,data);
+    console.log(request,"return filter product");
+    
+    return {
+        type: GET_PRODUCT_BY_FILTER,
+        payload: request.data
     }
 }
 

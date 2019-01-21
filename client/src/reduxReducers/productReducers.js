@@ -4,6 +4,7 @@ import {
     GET_PRODUCT_BY_SELL,
     GET_BRANDS,
     GET_WOODS,
+    GET_PRODUCT_BY_FILTER
 } from '../reduxActions/types';
 
 const initialState = {
@@ -16,7 +17,12 @@ const initialState = {
     brands: {
         success: false, brandData:[]
     }, 
-    allProducts:[]
+    allProducts:[],
+    filterProduct: {
+        success: false,
+        size: 0,
+        products: []
+    }
 };
 
 export default function(state = initialState, action) {
@@ -25,6 +31,12 @@ export default function(state = initialState, action) {
         return { ...state, success: true, byArrival: action.payload.products}
     case GET_PRODUCT_BY_SELL:
         return {...state, success: true, bySell: action.payload.products}
+    case GET_PRODUCT_BY_FILTER:
+        const filterProduct = {
+            size: action.payload.size,
+            products: action.payload.products
+        }
+        return {...state, filterProduct: filterProduct}
     case GET_BRANDS:
         return {...state, success: true, brands: action.payload}
     case GET_WOODS:
