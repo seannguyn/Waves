@@ -18,11 +18,11 @@ export default function (ComposedClass, reload, isPublic=false, adminRoute = nul
                   loading: false
                 })
               }, 500)
-              props.dispatch(auth()) 
+            //   props.dispatch(auth()) 
         }
 
         componentDidMount() {
-            // this.props.dispatch(auth())            
+            this.props.dispatch(auth())            
             
             // this.props.auth();
             // console.log("State",this.state);
@@ -87,76 +87,10 @@ export default function (ComposedClass, reload, isPublic=false, adminRoute = nul
     function mapStateToProps(state) {
         
         return {
-            user: state.user
+            user: state.user,
         }
     }
       
     return connect(mapStateToProps)(ProtectedRoute);
-    // return connect(mapStateToProps,{auth,dispatch})(ProtectedRoute);
-    // connect((state, props) => ({
-    //     clients: state.firestore.ordered.clients
-    //   }))
-  
+
 }
-
-
-
-
-// import React, { Component } from 'react';
-// import { connect } from 'react-redux';
-// import { auth } from '../reduxActions/userActions';
-// import CircularProgress from '@material-ui/core/CircularProgress';
-
-// export default function(ComposedClass,reload,adminRoute = null){
-//     class AuthenticationCheck extends Component {
-
-//         state = {
-//             loading: true
-//         }
-
-//         componentDidMount(){
-//             this.props.dispatch(auth()).then(response =>{
-//                 let userSuccess = this.props.user.success;
-
-//                 if(!userSuccess){
-//                     if(reload){
-//                         this.props.history.push('/register_login')
-//                     }
-//                 } else{
-//                     if(adminRoute && !user.isAdmin){
-                        
-//                     } else{
-//                         if(reload === false){
-//                             this.props.history.push('/user/dashboard')
-//                         }
-//                     }
-//                 }
-//                 this.setState({loading:false})
-//             })
-//         }
-
-
-//         render() {
-//             if(this.state.loading){
-//                 return (
-//                     <div className="main_loader">
-//                         <CircularProgress style={{color:'#2196F3'}} thickness={7}/> 
-//                     </div>
-//                 )
-//             }
-//             return (
-//                <ComposedClass {...this.props} user={this.props.user}/>
-//             );
-//         }
-//     }
-
-//     function mapStateToProps(state){
-//         return {
-//             user: state.user
-//         }
-//     }
-
-//     return connect(mapStateToProps)(AuthenticationCheck)
-// }
-
-

@@ -197,6 +197,8 @@ app.delete('/api/wood/:id', auth, admin, (req,res) => {
     
 })
 
+// ********************** FRETS **********************
+// create model, create route
 
 // ********************** PRODUCT **********************
 app.post('/api/product', auth, admin,(req,res) => {
@@ -260,10 +262,10 @@ app.get('/api/products/query', (req,res) => {
 })
 
 // BY ARRIVAL
-// /articles?sortBy=createdAt&order=desc&limit=4
+// /otherquery?sortBy=createdAt&order=desc&limit=4
 
 // BY SELL
-// /articles?sortBy=sold&order=desc&limit=100
+// /otherquery?sortBy=sold&order=desc&limit=100
 app.get('/api/products/otherquery',(req,res)=>{
 
     let order = req.query.order ? req.query.order : 'asc';
@@ -276,8 +278,8 @@ app.get('/api/products/otherquery',(req,res)=>{
     populate('wood').
     sort([[sortBy,order]]).
     limit(limit)
-    .then((items) => res.json({'success': 'true', items:items}))
-    .catch((err) => res.status(404).json({'success': 'false',message:err}))
+    .then((items) => res.json({'success': true, products:items}))
+    .catch((err) => res.status(404).json({'success': false ,message:err}))
 })
 
 app.delete('/api/product/:product_id', auth, admin, (req,res) => {

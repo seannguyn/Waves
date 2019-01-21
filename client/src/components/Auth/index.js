@@ -3,7 +3,6 @@ import MyButton from '../Button/mybutton';
 import Login from './login';
 const Auth = (props) => {
   return (
-      <div>
     <div className="page_wrapper">
             <div className="container">
                 <div className="register_login_container">
@@ -27,8 +26,6 @@ const Auth = (props) => {
                 </div>
             </div>
             
-        </div>
-        hello
         </div>
   )
 }
