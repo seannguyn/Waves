@@ -34,19 +34,26 @@ export async function getProductBySell(){
 }
 
 export async function getProductByFilter({skip, limit, filter}, previousState =[]) {
-    console.log("skip",skip);
+    
     const data = {
         skip,
         limit,
         filter,
     }
 
+    console.log(previousState,"HELLO");
     const request = await axios.post(`/api/products/shop`,data);
     console.log(request,"return filter product");
-    
+
+    const returnFilterProduct = {
+        success: request.data.success,
+        size: request.data.size,
+        products: previousState.concat(request.data.products)
+    }
+
     return {
         type: GET_PRODUCT_BY_FILTER,
-        payload: request.data
+        payload: returnFilterProduct
     }
 }
 

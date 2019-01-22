@@ -5,10 +5,10 @@ import {getWoods, getBrands, getProductByFilter} from '../../reduxActions/produc
 import CollapseCheckbox from './collapse_checkbox';
 import CollapseRadio from './collapse_radio';
 import {frets,price} from '../../constant/constant';
-
+import LoadMore from './loadmore';
 class Shop extends Component {
 
-    constructor(props) {
+    constructor(props) { 
         super(props);
         this.state = {
             grid: '',
@@ -34,8 +34,6 @@ class Shop extends Component {
         const newFilter = {...filter};
         newFilter[category] = returnFilter;
 
-        
-
         this.setState({
             skip: 0,
             filter: newFilter
@@ -43,6 +41,26 @@ class Shop extends Component {
             this.props.dispatch(getProductByFilter(this.state));
         })
         
+    }
+
+    loadMore() {
+        const {limit, skip} = this.state;
+        const {filterProduct} = this.props.products;
+        let newSKip = skip + limit;
+
+        this.setState({
+           skip: newSKip 
+        },() => {
+            this.props.dispatch(getProductByFilter(this.state,filterProduct.products));
+        })
+
+        
+        // newSkip = this.state.skip + this.state.limit
+        // setState newSkip
+        // dispatch filter product
+        // go to redux, concat old state with new state
+
+        console.log("loading more item");
     }
 
     render() {
@@ -85,7 +103,21 @@ class Shop extends Component {
                         </div>
 
                         <div className="right">
-                            right
+                            <div className="shop_options">
+                                <div className="shop_grid clear">
+                                    
+                                </div>
+                            </div>
+
+                            <LoadMore
+                                products={this.props.products}
+                                configuration = {{
+                                    skip: this.state.skip,
+                                    limit: this.state.limit,
+                                    grid: this.state.grid
+                                }}
+                                loadMore={this.loadMore.bind(this)}
+                            />
                         </div>
                     </div>
                 </div>

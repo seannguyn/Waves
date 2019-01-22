@@ -19,7 +19,7 @@ const initialState = {
     }, 
     allProducts:[],
     filterProduct: {
-        success: false,
+        success: false, 
         size: 0,
         products: []
     }
@@ -33,6 +33,7 @@ export default function(state = initialState, action) {
         return {...state, success: true, bySell: action.payload.products}
     case GET_PRODUCT_BY_FILTER:
         const filterProduct = {
+            success: action.payload.success,
             size: action.payload.size,
             products: action.payload.products
         }
