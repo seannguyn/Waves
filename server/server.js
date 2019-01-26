@@ -1,16 +1,26 @@
+// ============================
+// ====== BASIC CONFIG
+// ============================
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookiesParser = require('cookie-parser');
 require('dotenv').config();
 
-
+// ============================
+// ====== MIDDLEWARE
+// ============================
+const {auth} = require('./middlewares/auth');
+const {admin} = require('./middlewares/admin');
 const app = express();
+
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(cookiesParser());
 
-// connect database
+// ============================
+// ====== DATABASE CONNECTION 
+// ============================
 mongoose.Promise = global.Promise
 mongoose
 .connect(process.env.DATABASE)
@@ -25,11 +35,7 @@ const Brand = require('./models/brand');
 const Wood = require('./models/wood');
 const Product = require('./models/product');
 
-// ============================
-// ====== MIDDLEWARE
-// ============================
-const {auth} = require('./middlewares/auth');
-const {admin} = require('./middlewares/admin');
+
 
 // ============================
 // ====== ROUTE
@@ -253,14 +259,14 @@ app.post('/api/product', auth, admin,(req,res) => {
     product.save()
     .then((item) => {
         return res.status(200).json({
-            success:"true",
+            success:true,
             productData:item,
         });
     })
     .catch((error)=>{
         return res.status(200).json({
-            success:"false",
-            message:error,
+            success:false,
+            productData:error,
         });
     })
 })
@@ -335,7 +341,9 @@ app.delete('/api/product/:product_id', auth, admin, (req,res) => {
     .catch((err) => res.status(404).json({'success': 'false',message:err}))
 })
 
-// run port and app
+// ============================
+// ====== RUN APP 
+// ============================
 const port = process.env.PORT || 3002;
 
 app.listen(port,()=>{

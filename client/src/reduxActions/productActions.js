@@ -5,6 +5,7 @@ import {
     GET_BRANDS,
     GET_WOODS,
     GET_PRODUCT_BY_FILTER,
+    ADD_PRODUCT,
 } from './types';
 
 // BY ARRIVAL
@@ -41,9 +42,7 @@ export async function getProductByFilter({skip, limit, filter}, previousState =[
         filter,
     }
 
-    console.log(previousState,"HELLO");
     const request = await axios.post(`/api/products/shop`,data);
-    console.log(request,"return filter product");
 
     const returnFilterProduct = {
         success: request.data.success,
@@ -54,6 +53,16 @@ export async function getProductByFilter({skip, limit, filter}, previousState =[
     return {
         type: GET_PRODUCT_BY_FILTER,
         payload: returnFilterProduct
+    }
+}
+
+export async function addProduct(dataToSubmit) {
+    const request = await axios.post(`/api/product`,dataToSubmit);
+    console.log(request,"submit data");
+    
+    return {
+        type: ADD_PRODUCT,
+        payload: request.data,
     }
 }
 

@@ -9,3 +9,5 @@ export const GET_PRODUCT_BY_FILTER = 'get_product_by_filter';
 
 export const GET_BRANDS = 'get_brands';
 export const GET_WOODS = 'get_woods';
+
+export const ADD_PRODUCT = 'add_product';

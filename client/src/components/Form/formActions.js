@@ -68,3 +68,19 @@ export const isFormValid = (formdata, formName) => {
     return formIsValid;
 
 }
+
+export const populateField = (oldFormData, arrayData=[], category) => {
+    var newFormData = {
+        ...oldFormData
+    }
+    var newList = [];
+
+    arrayData.forEach((item) => {
+        newList.push({key: item._id, value: item.name});
+    })
+
+    newFormData[category].config.options = newList;
+
+    return newFormData;
+    
+}

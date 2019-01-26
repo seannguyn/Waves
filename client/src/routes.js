@@ -7,12 +7,15 @@ import Layout from './hoc/layout';
 import UserDashboard from './components/User';
 import ProtectedRoute from './hoc/authRoute'
 import Shop from './components/Shop';
+import AddProduct from './components/User/Admin/add_product'
 
 const Routes = () => {
   return (
     <Layout>
       <Switch>
         <Route exact path="/user/dashboard" component={ProtectedRoute(UserDashboard,true)}/>
+        <Route exact path="/admin/add_product" component={ProtectedRoute(AddProduct,true)}/>
+
         <Route exact path="/" component={ProtectedRoute(Home,false,true)}/>
         <Route exact path="/shop" component={ProtectedRoute(Shop,false,true)}/>
         <Route exact path="/register_login" component={ProtectedRoute(Auth,false)}/>

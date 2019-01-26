@@ -4,7 +4,8 @@ import {
     GET_PRODUCT_BY_SELL,
     GET_BRANDS,
     GET_WOODS,
-    GET_PRODUCT_BY_FILTER
+    GET_PRODUCT_BY_FILTER,
+    ADD_PRODUCT
 } from '../reduxActions/types';
 
 const initialState = {
@@ -42,6 +43,12 @@ export default function(state = initialState, action) {
         return {...state, success: true, brands: action.payload}
     case GET_WOODS:
         return {...state, success: true, woods: action.payload}
+    case ADD_PRODUCT:
+        const addProduct = {
+            success: action.payload.success, 
+            newProduct: action.payload.productData
+        }
+        return {...state, addProduct: addProduct}
     default:
       return state;
   }
