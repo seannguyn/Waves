@@ -33,6 +33,9 @@ export const update = (element, formdata, formName ) => {
         ...newFormdata[element.id]
     }
 
+    console.log(newElement,"NEW ELEMENT");
+    
+
     newElement.value = element.event.target.value;
 
     if(element.blur){
@@ -64,6 +67,9 @@ export const isFormValid = (formdata, formName) => {
 
     for(let key in formdata){
         formIsValid = formdata[key].valid && formIsValid
+        if (formIsValid === false) {
+            console.log(formdata[key]);
+        }
     }
     return formIsValid;
 
