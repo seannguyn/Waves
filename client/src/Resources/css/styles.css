@@ -886,6 +886,7 @@ footer .business_nfo .nfo {
     height: 160px;
     padding: 10px;
     box-sizing: border-box;
+    cursor: pointer;
 }
 
 .dropzone_box  .wrap {

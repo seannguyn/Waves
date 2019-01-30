@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { update, generateData, isFormValid, populateField } from '../../Form/formActions'
 import FormField from '../../Form/formfield';
 import {getBrands,getWoods,addProduct} from '../../../reduxActions/productActions';
+import FileUpload from '../../Form/fileUpload'
 
 class AddProduct extends Component {
 
@@ -247,11 +248,18 @@ class AddProduct extends Component {
         });
     }
 
+    handleImageUpload(imagesFiles) {
+        console.log(imagesFiles);
+    }
+
     render() {
         return (
             <UserLayout>
                 <h1>Add product</h1>
                 <form onSubmit={this.submit.bind(this)}>
+
+                    <FileUpload handleImageUpload={this.handleImageUpload.bind(this)}/>
+
                     <FormField
                         id={'name'}
                         formdata={this.state.formdata.name}

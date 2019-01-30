@@ -63,7 +63,8 @@ class Login extends Component {
         
         let dataToSubmit = generateData(this.state.formdata,'login');
         let formIsValid = isFormValid(this.state.formdata,'login')
-
+        console.log("HERE???",this.state.formdata);
+        
         if(formIsValid){
 
             // this.props.loginUser(dataToSubmit);

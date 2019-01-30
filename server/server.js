@@ -5,6 +5,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookiesParser = require('cookie-parser');
+const formidable = require('express-formidable');
+const cloudinary = require('cloudinary');
 require('dotenv').config();
 
 // ============================
@@ -26,6 +28,12 @@ mongoose
 .connect(process.env.DATABASE)
 .then(() =>{console.log("connected to mongo")})
 .catch((e) => console.log("error"))
+
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.CLOUD_API_KEY,
+    api_secret: process.env.CLOUD_API_SECRET,
+})
 
 // ============================
 // ====== MODELS
@@ -339,6 +347,39 @@ app.delete('/api/product/:product_id', auth, admin, (req,res) => {
     Product.findOne({_id:req.params.product_id})
     .then((item) => item.remove().then(() => res.json({'success': 'true'})))
     .catch((err) => res.status(404).json({'success': 'false',message:err}))
+})
+
+app.post('/api/product/uploadImage', auth, admin, formidable(), (req,res) => {
+
+    cloudinary.uploader.upload(req.files.imageFile.path,(result) => {
+        return res.status(200).json({
+            public_id: result.public_id,
+            url: result.url
+        })
+    }, {
+        public_id :`${Date.now()}`,
+        resource_type: 'auto'
+    })
+})
+
+app.get('/api/product/removeImage/:public_id', auth, admin, (req, res) => {
+    const public_id = req.params.public_id;
+    console.log("WE HERE");
+    
+    if (public_id) {
+        cloudinary.uploader.destroy(public_id,(error,result)=>{
+
+            if(error) return res.json({succes:false,error});
+            res.status(200).json({succes:true,message:"deleted images"})
+        })
+
+    } else {
+        return res.status(200).json({
+            success: false,
+            message: "no public_id provided"
+        })
+    }
+
 })
 
 // ============================
