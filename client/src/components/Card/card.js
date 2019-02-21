@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import MyButton from '../Button/mybutton';
+import {connect} from 'react-redux';
+import {addToCart} from '../../reduxActions/userActions';
+import {addCartLocalStorage} from '../../reduxActions/localCartActions';
 
 class Card extends Component {
 
-    renderCardImage(images){
+    renderCardImage(images){        
         if(images.length > 0){
             return images[0].url
         } else {
@@ -11,6 +14,18 @@ class Card extends Component {
         }
     }
 
+    addToCart(userAuthenticated, id) {
+        if (userAuthenticated) {
+            this.props.dispatch(addToCart(this.props.user, id))
+            // .then(response => console.log(response))
+            // .catch(error => console.log(error));
+        } else {
+            this.props.dispatch(addCartLocalStorage(id))
+            // .then(response => console.log(response))
+            // .catch(error => console.log(error));
+        }
+        
+    }
 
     render() {
         const props = this.props;
@@ -53,7 +68,7 @@ class Card extends Component {
                             <MyButton
                                 type="bag_link"
                                 runAction={()=>{
-                                    console.log('added to cart')
+                                    this.addToCart(this.props.user.success, props._id);
                                 }}
                             />
                         </div>
@@ -64,4 +79,10 @@ class Card extends Component {
     }
 }
 
-export default Card;
+function mapStateToProps(state) {
+    return {
+        user: state.user
+    }
+}
+
+export default connect(mapStateToProps)(Card);

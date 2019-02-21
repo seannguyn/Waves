@@ -6,6 +6,11 @@ import {
     GET_WOODS,
     GET_PRODUCT_BY_FILTER,
     ADD_PRODUCT,
+    CLEAR_ADDED_PRODUCT,
+    ADD_BRAND,
+    ADD_WOOD,
+    GET_PRODUCT_BY_ID,
+    CLEAR_GET_PRODUCT_BY_ID,
 } from './types';
 
 // BY ARRIVAL
@@ -56,6 +61,22 @@ export async function getProductByFilter({skip, limit, filter}, previousState =[
     }
 }
 
+export async function getProductById(productId) {
+    const product = await axios.get(`/api/product/${productId}`)
+                    
+    return {
+        type: GET_PRODUCT_BY_ID,
+        payload: product.data
+    }
+}
+
+export async function clearGetProductById() {
+    return {
+        type: CLEAR_GET_PRODUCT_BY_ID,
+        payload: {success: false, productData: {}}
+    }
+}
+
 export async function addProduct(dataToSubmit) {
     const request = await axios.post(`/api/product`,dataToSubmit);
     console.log(request,"submit data");
@@ -63,6 +84,14 @@ export async function addProduct(dataToSubmit) {
     return {
         type: ADD_PRODUCT,
         payload: request.data,
+    }
+}
+
+export async function clearAddedProduct(dataToSubmit) {
+    
+    return {
+        type: CLEAR_ADDED_PRODUCT,
+        payload: {}
     }
 }
 
@@ -82,6 +111,23 @@ export async function getBrands() {
     }
 }
 
+export async function addBrand(dataToSubmit,existingBrand=[]) {
+
+    const request = await axios.post('/api/brand',dataToSubmit)
+                    .then(response => response.data)
+                    .catch(error => console.log(error));
+
+    let newBrandList = [...existingBrand,request.brandData]
+
+    return {
+        type: ADD_BRAND,
+        payload: {
+            success: true,
+            brandData: newBrandList
+        }
+    }
+}
+
 export async function getWoods() {
 
     const request = await axios.get('/api/woods')
@@ -91,5 +137,22 @@ export async function getWoods() {
     return {
         type: GET_WOODS,
         payload: request,
+    }
+}
+
+export async function addWood(dataToSubmit,existingWood=[]) {
+
+    const request = await axios.post('/api/wood',dataToSubmit)
+                    .then(response => response.data)
+                    .catch(error => console.log(error));
+
+    let newWoodList = [...existingWood,request.woodData]
+    
+    return {
+        type: ADD_WOOD,
+        payload: {
+            success: true,
+            woodData:newWoodList
+        }
     }
 }

@@ -2,14 +2,21 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux';
 import { Link, withRouter} from 'react-router-dom';
 import {logoutUser} from '../../../reduxActions/userActions'
+import {clearCartLocalStorage} from '../../../reduxActions/localCartActions';
+
 class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
             publicLinks: [
                 {
+                    name: 'Cart',
+                    path: '/cart',
+                    public: true,
+                },
+                {
                     name: 'Guitar',
-                    path: '/guitar',
+                    path: '/shop',
                     public: true,
                 },
                 {
@@ -23,11 +30,6 @@ class Header extends Component {
                     name: 'Login',
                     path: '/register_login',
                     public: true
-                },
-                {
-                    name: 'My Cart',
-                    path: '/user/cart',
-                    public: false,
                 },
                 {
                     name: 'My Account',
@@ -73,7 +75,7 @@ class Header extends Component {
         }
 
         return displayLinks.map((item,i)=>{
-            if(item.name !== 'My Cart'){
+            if(item.name !== 'Cart'){
                 return this.defaultLink(item,i)
             } else {
                 return this.cartLink(item,i)
@@ -84,6 +86,11 @@ class Header extends Component {
 
     logoutHandler = () => {
         this.props.dispatch(logoutUser())
+        .then(response => {
+            this.props.dispatch(clearCartLocalStorage());
+            this.props.history.push('/');
+        })
+        
     }
 
     componentWillUpdate = nextProps => {
@@ -95,11 +102,15 @@ class Header extends Component {
     }
 
     cartLink = (item,i) => {
-        const user = this.props.user.user;
-
+        var cartCount = 0;
+        if (this.props.user.success) {
+            cartCount = this.props.user.user.cart.length;
+        } else {
+            cartCount = this.props.localCart.length
+        }
         return (
             <div className="cart_link" key={i}>
-                <span>{user.cart ? user.cart.length:0}</span>
+                <span>{cartCount}</span>
                 <Link to={item.path}>
                     {item.name}
                 </Link>
@@ -147,7 +158,8 @@ class Header extends Component {
 
 function mapStateToProps(state){
     return {
-        user: state.user
+        user: state.user,
+        localCart: state.localCart.localCart
     }
 }
 

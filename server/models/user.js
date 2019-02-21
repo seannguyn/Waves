@@ -72,7 +72,7 @@ UserSchema.methods.isValidPassword = async function(newPassword,hashPW) {
 }
 
 // models methods
-UserSchema.methods.generateToken = async function() {
+UserSchema.methods.generateToken = async function(cart=[]) {
     try {
 
         const token = JWT.sign({
@@ -83,6 +83,7 @@ UserSchema.methods.generateToken = async function() {
         }, process.env.JWT_KEY)
 
         this.token = token;
+        this.cart = cart;
         await this.save()
 
         return this;

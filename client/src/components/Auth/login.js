@@ -63,16 +63,18 @@ class Login extends Component {
         
         let dataToSubmit = generateData(this.state.formdata,'login');
         let formIsValid = isFormValid(this.state.formdata,'login')
-        console.log("HERE???",this.state.formdata);
         
         if(formIsValid){
-
+            
+            
             // this.props.loginUser(dataToSubmit);
             this.props.dispatch(loginUser(dataToSubmit)).then(response =>{
                 if(response.payload.success){
                     console.log(response.payload);
-                    this.props.history.push('/user/dashboard')
+                    this.props.history.push(this.props.redirect.link);
                 }else{
+                    console.log(response);
+                    
                     this.setState({
                         formError: true
                     })
@@ -119,15 +121,15 @@ class Login extends Component {
   }
 }
 
-// const mapStateToProps = (state) => ({
-//     user: state.user
-// })
+const mapStateToProps = (state) => ({
+    redirect: state.redirect
+})
 
 Login.defaultProps = {
     success: "false",
     user: null,
 };
 
-export default connect()(withRouter(Login));
+export default connect(mapStateToProps)(withRouter(Login));
 
 // export default connect(mapStateToProps,{loginUser})(withRouter(Login));

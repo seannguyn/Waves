@@ -2,10 +2,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { auth } from '../reduxActions/userActions';
-
+import {initCartLocalStorage} from '../reduxActions/localCartActions'
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-export default function (ComposedClass, reload, isPublic=false, adminRoute = null) {
+export default function (ComposedClass, reload, isPublic=false, adminRoute = null, linkTo=null) {
     class ProtectedRoute extends Component {
 
         constructor(props) {
@@ -22,7 +22,14 @@ export default function (ComposedClass, reload, isPublic=false, adminRoute = nul
         }
 
         componentDidMount() {
-            this.props.dispatch(auth())            
+            this.props.dispatch(auth())
+            .then(response => {
+                console.log("auth step", response)
+                if (response.payload.validToken === false) {
+                    this.props.dispatch(initCartLocalStorage());
+                }
+            })   
+            .catch(error => console.log("auth step", error))       
             
             // this.props.auth();
             // console.log("State",this.state);
@@ -48,6 +55,7 @@ export default function (ComposedClass, reload, isPublic=false, adminRoute = nul
                 if(!nextProps.user.success) {
                     if(reload){
                         this.props.history.push('/register_login')
+                        // add parameters here 
                     }
                 } else {
                     if (adminRoute && nextProps.user.user.role !== 1) {
@@ -58,8 +66,7 @@ export default function (ComposedClass, reload, isPublic=false, adminRoute = nul
                         }
                     }
                 }
-            }
-            
+            } 
         }
 
         render() {

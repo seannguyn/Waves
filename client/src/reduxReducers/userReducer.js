@@ -3,7 +3,11 @@ import {
     LOGIN_USER,
     REGISTER_USER,
     AUTH_USER,
-    LOGOUT_USER
+    LOGOUT_USER,
+    SERVER_ADD_CART,
+    SERVER_REMOVE_CART,
+    USER_PURCHASE_ITEM,
+    UPDATE_PROFILE,
 } from '../reduxActions/types';
 
 const initialState = {success:false};
@@ -15,13 +19,36 @@ export default function(state = initialState, action) {
     case REGISTER_USER:
         return {...state, success: action.payload.success, user: action.payload.userData }
     case AUTH_USER:
-        console.log("request auth", action.payload);
         if (action.payload.validToken === true) {
             return {...state, success: action.payload.success, user: action.payload.userData}
         } else {
             return state;
         }
     case LOGOUT_USER:
+        return { ...state, success: action.payload.success, user: action.payload.userData }
+
+    case SERVER_ADD_CART: 
+    
+        if (action.payload.success) {
+            return { 
+                ...state, 
+                user: {
+                    ...state.user,
+                    cart: action.payload.cart
+                } 
+            }
+        } else {
+            return { 
+                ...state, 
+            }
+        }
+    case SERVER_REMOVE_CART:
+        return { ...state, success: action.payload.success, user: action.payload.userData }
+    
+    case USER_PURCHASE_ITEM: 
+        return { ...state, success: action.payload.success, user: action.payload.userData }
+
+    case UPDATE_PROFILE:
         return { ...state, success: action.payload.success, user: action.payload.userData }
         
     default:

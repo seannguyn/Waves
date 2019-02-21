@@ -77,6 +77,15 @@ class FileUpload extends Component {
         )
     )
 
+    static getDerivedStateFromProps(props, state) {
+        if (props.reset === true) {
+            return state = {
+                imageFiles:[]
+            }
+        }
+        return null;
+    }   
+
     render() {
         return (
             <div>

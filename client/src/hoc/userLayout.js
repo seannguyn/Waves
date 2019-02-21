@@ -8,7 +8,7 @@ const userLinks = [
     },
     {
         name: 'User information',
-        linkTo: '/user/user_profile'
+        linkTo: '/user/update_profile'
     },
     {
         name: 'My Cart',

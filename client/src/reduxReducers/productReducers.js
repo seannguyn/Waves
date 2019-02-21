@@ -5,7 +5,12 @@ import {
     GET_BRANDS,
     GET_WOODS,
     GET_PRODUCT_BY_FILTER,
-    ADD_PRODUCT
+    ADD_PRODUCT,
+    CLEAR_ADDED_PRODUCT,
+    ADD_BRAND,
+    ADD_WOOD,
+    GET_PRODUCT_BY_ID,
+    CLEAR_GET_PRODUCT_BY_ID
 } from '../reduxActions/types';
 
 const initialState = {
@@ -21,8 +26,16 @@ const initialState = {
     allProducts:[],
     filterProduct: {
         success: false, 
-        size: 0,
+        size: -1,
         products: []
+    },
+    newProduct: {
+        success: false,
+        newProduct: {}
+    },
+    productDetail: {
+        success: false,
+        productData: {}
     }
 };
 
@@ -39,16 +52,54 @@ export default function(state = initialState, action) {
             products: action.payload.products
         }
         return {...state, filterProduct: filterProduct}
+
     case GET_BRANDS:
         return {...state, success: true, brands: action.payload}
+    case ADD_BRAND:
+        return {
+            ...state, 
+            success: true, 
+            brands: action.payload
+        };
+        
     case GET_WOODS:
-        return {...state, success: true, woods: action.payload}
+        return {...state, success: true, woods: action.payload};
+
+    case ADD_WOOD:
+        return {
+            ...state, 
+            success: true, 
+            woods: action.payload
+        }
+
     case ADD_PRODUCT:
         const addProduct = {
             success: action.payload.success, 
             newProduct: action.payload.productData
         }
         return {...state, addProduct: addProduct}
+
+    case CLEAR_ADDED_PRODUCT:
+        return {
+            ...state, 
+            addProduct:{
+                success: false,
+                newProduct: {}
+            }
+        }
+    
+    case GET_PRODUCT_BY_ID:
+        return {
+            ...state,
+            productDetail: action.payload
+        }
+    
+    case CLEAR_GET_PRODUCT_BY_ID:
+        return {
+            ...state,
+            productDetail: action.payload
+        }
+
     default:
       return state;
   }

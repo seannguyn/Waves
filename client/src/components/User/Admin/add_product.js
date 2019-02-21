@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import UserLayout from '../../../hoc/userLayout'
 import { connect } from 'react-redux';
-import { update, generateData, isFormValid, populateField } from '../../Form/formActions'
+import { update, generateData, isFormValid, populateField, resetFormData } from '../../Form/formActions'
 import FormField from '../../Form/formfield';
-import {getBrands,getWoods,addProduct} from '../../../reduxActions/productActions';
+import {getBrands, getWoods, addProduct, clearAddedProduct} from '../../../reduxActions/productActions';
 import FileUpload from '../../Form/fileUpload'
 
 class AddProduct extends Component {
@@ -191,6 +191,22 @@ class AddProduct extends Component {
 
     resetFields() {
         console.log('successful');
+        const {formdata} = this.state;
+
+        const resetData = resetFormData(formdata);
+
+        this.setState({
+            formdata: resetData,
+            formSuccess: true,
+        });
+
+        setTimeout(() => {
+            this.setState({
+                formSuccess: false,
+            },() => {
+                this.props.dispatch(clearAddedProduct());
+            })
+        },2000)
     }
 
     submit(e) {
@@ -204,7 +220,9 @@ class AddProduct extends Component {
             console.log("about to submit VALID",dataToSubmit);
             this.props.dispatch(addProduct(dataToSubmit)).then(() => {
                 if (this.props.products.addProduct.success) {
+
                     this.resetFields();
+                    
                 } else {
                     this.setState({
                         formError: true
@@ -213,7 +231,6 @@ class AddProduct extends Component {
                 
             });
         } else {
-            console.log("about to submit INVALID");
             this.setState({
                 formError: true
             })
@@ -250,6 +267,13 @@ class AddProduct extends Component {
 
     handleImageUpload(imagesFiles) {
         console.log(imagesFiles);
+
+        let newFormData = {...this.state.formdata};
+        newFormData.images.value = imagesFiles;
+
+        this.setState({
+            formdata: newFormData
+        })
     }
 
     render() {
@@ -258,7 +282,10 @@ class AddProduct extends Component {
                 <h1>Add product</h1>
                 <form onSubmit={this.submit.bind(this)}>
 
-                    <FileUpload handleImageUpload={this.handleImageUpload.bind(this)}/>
+                    <FileUpload 
+                        handleImageUpload={this.handleImageUpload.bind(this)}
+                        reset={this.state.formSuccess}
+                    />
 
                     <FormField
                         id={'name'}

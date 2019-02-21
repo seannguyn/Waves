@@ -7,6 +7,9 @@ const bodyParser = require('body-parser');
 const cookiesParser = require('cookie-parser');
 const formidable = require('express-formidable');
 const cloudinary = require('cloudinary');
+const Helper = require('./helper');
+const asyncCall = require('async');
+
 require('dotenv').config();
 
 // ============================
@@ -27,7 +30,7 @@ mongoose.Promise = global.Promise
 mongoose
 .connect(process.env.DATABASE)
 .then(() =>{console.log("connected to mongo")})
-.catch((e) => console.log("error"))
+.catch((e) => console.log("ERROR: CANNOT CONNECT TO MONGO"))
 
 cloudinary.config({
     cloud_name: process.env.CLOUD_NAME,
@@ -42,8 +45,8 @@ const User = require('./models/user');
 const Brand = require('./models/brand');
 const Wood = require('./models/wood');
 const Product = require('./models/product');
-
-
+const Payment = require('./models/payment');
+const SiteInfo = require('./models/siteinfo');
 
 // ============================
 // ====== ROUTE
@@ -76,33 +79,51 @@ app.post('/api/user/register', (req,res) => {
 
 app.post('/api/user/login', async (req,res) => {
 
-    const user = await User.findOne({email:req.body.email});
-    if (user) {
-        // proceed to check password, 
-        const matched = await user.isValidPassword(req.body.password,user.password);
-        if(matched) {
+    // if req.body.cart.length > 0, save cart
+    
+    try {
+        const user = await User.findOne({email:req.body.email});
+        
+        // const user = await User.findOneAndUpdate({email:req.body.email}, {cart:req.body.cart}, {new: true});
+        if (user) {
+            
+            // proceed to check password, 
+            const matched = await user.isValidPassword(req.body.password,user.password);
+            if(matched) {
+                
+                // merge cart
+                const newCart = await Helper.cartIntersection(req.body.cart, user.cart);
 
-            // proceed to give this user a token 
-            const userWithToken = await user.generateToken();
+                // proceed to give this user a token 
+                
+                const userWithToken = await user.generateToken(newCart);
+                
+                return res.cookie('waves_auth',userWithToken.token).status(200).json({
+                    success: true,
+                    userData: userWithToken,
+                });
 
-            return res.cookie('waves_auth',userWithToken.token).status(200).json({
-                success: true,
-                userData: userWithToken,
-            });
-
-        }else {
+            }else {
+                return res.status(200).json({
+                    success: false,
+                    userData:"wrong PW",
+                })
+            }
+            
+        } else {
             return res.status(200).json({
                 success: false,
-                userData:"wrong PW",
+                userData:"user not found",
             })
         }
+    } catch(error) {
         
-    } else {
         return res.status(200).json({
             success: false,
-            userData:"user not found",
+            userData: error,
         })
     }
+    
 })
 
 app.get('/api/user/logout',auth ,(req,res) => {
@@ -115,6 +136,133 @@ app.get('/api/user/logout',auth ,(req,res) => {
             })
     })
     
+})
+
+app.post('/api/users/addToCart',auth, async (req,res)=>{
+
+    // merge cart
+    try {
+        const newCart = await Helper.cartIntersection(req.body.user.cart, req.body.cartItem);
+
+        await User.findOneAndUpdate({email:req.body.user.email}, {cart:newCart}, {new: true});
+
+        // console.log(req.body.user,req.body.cartItem);
+
+        return res.status(200).json({
+            success: true,
+            cart: newCart,
+        })
+
+    } catch(error) {
+
+        return res.status(200).json({
+            success: false,
+            error: error,
+        })
+    }
+    
+    
+});
+
+app.post('/api/users/updateProfile',auth, async (req,res) => {
+    try {
+        const {firstName,lastName,email,_id} = req.body;
+
+        const user = await User.findOneAndUpdate({_id: _id},{
+            email,
+            firstName,
+            lastName,
+        },{new:true});
+
+        return res.status(200).json({
+            success: true,
+            userData: user
+        })
+
+    } catch(error) {
+        return res.status(200).json({
+            success: false,
+            userData: error,
+        })
+    }
+})
+
+app.post('/api/users/removeFromCart', auth, async (req, res) => {
+
+    try {
+        const user = await User.findOneAndUpdate({_id: req.body.userId}, {cart:req.body.cart}, {new: true});
+        return res.status(200).json({
+            success: true,
+            userData: user
+        })
+
+    } catch(error) {
+        return res.status(200).json({
+            success: false,
+            userData: error,
+        })
+    }
+})
+
+app.post('/api/users/purchaseItem',auth, async (req,res) => {
+    // going to get 
+    const {payment, cartData, userId} = req.body;
+    
+    let history = [];
+    let transactionData = {};
+
+    cartData.forEach( item => {
+        history.push({
+            dateOfPurchase: Date.now(),
+            name: item.name,
+            brand: item.brand.name,
+            id: item._id,
+            price: item.price,
+            quantity: item.quantity,
+            paymentId: payment.paymentID,
+        })
+    })
+
+    transactionData.user = mongoose.Types.ObjectId(userId);
+    transactionData.paymentData = payment;
+    transactionData.product = history
+    
+    console.log(transactionData);
+
+    try {
+
+        const user = await User.findOneAndUpdate({_id:userId}, {
+            $push:{history:history}, 
+            $set:{cart:[]},
+        },{new:true});
+
+        // const newPayment = await new Payment({transactionData});
+        const newPayment = new Payment({...transactionData});
+        await newPayment.save();
+
+        // async.eachOfSeries(array, stuff, callback);
+        asyncCall.eachSeries(
+            cartData, 
+            async (item) => {
+                await Product.findOneAndUpdate({_id:item._id},{$inc:{"sold": item.quantity}},{new: false});
+            },
+            (err) => {
+                if (err) res.status(200).json({success: false,err});
+
+                return res.status(200).json({
+                    success: true,
+                    userData: user
+                })
+            }
+        );
+
+        
+    } catch(error) {
+        return res.status(500).json({
+            success: false,
+            userData: error
+        })
+    }
 })
 
 // ********************** BRAND **********************
@@ -287,8 +435,10 @@ app.get('/api/products', (req,res) => {
 
 app.get('/api/product/:product_id', (req,res) => {
     Product.findOne({_id:req.params.product_id})
-    .then((item) => res.json({'success': 'true', productData:item}))
-    .catch((err) => res.status(404).json({'success': 'false',message:err}))
+    .populate("brand")
+    .populate("wood")
+    .then((item) => res.status(200).json({'success': true, productData:item}))
+    .catch((err) => res.status(200).json({'success': false,message:err}))
 })
 
 // app.get('/api/product/:brand_id', (req,res) => {
@@ -317,7 +467,7 @@ app.get('/api/products/query', (req,res) => {
     .find({"_id":{$in:items}})
     .populate("brand")
     .populate("wood")
-    .then((items) => {res.status(200).json({success:"true",products:items})})
+    .then((items) => {res.status(200).json({success:"true",productData:items})})
     .catch((error) => {res.status(404).json({success:"false",message:error})})
 
 })
@@ -364,7 +514,6 @@ app.post('/api/product/uploadImage', auth, admin, formidable(), (req,res) => {
 
 app.get('/api/product/removeImage/:public_id', auth, admin, (req, res) => {
     const public_id = req.params.public_id;
-    console.log("WE HERE");
     
     if (public_id) {
         cloudinary.uploader.destroy(public_id,(error,result)=>{
@@ -380,6 +529,62 @@ app.get('/api/product/removeImage/:public_id', auth, admin, (req, res) => {
         })
     }
 
+})
+
+// ********************** SITEINFO **********************
+// app.post('/api/siteinfo', async (req, res) => {
+
+//     try {
+//         const siteInfo = new SiteInfo(req.body);
+//         await siteInfo.save();
+
+//         return res.status(200).json({
+//             success: true,
+//             siteInfo: siteInfo
+//         })
+//     } catch(error) {
+//         return res.status(200).json({
+//             success: false,
+//             error
+//         })
+//     }
+    
+// })
+
+app.post('/api/siteinfo', auth, admin, async (req, res) => {
+
+    try {
+        const {address, email, workingHours, phone} = req.body;
+        await SiteInfo.findOneAndUpdate({id: 1},{$set: {address,email,workingHours,phone}});
+        const siteInfo = await SiteInfo.find({id: 1});
+        return res.status(200).json({
+            success: true,
+            siteInfo: siteInfo
+        })
+    } catch(error) {
+        return res.status(200).json({
+            success: false,
+            error
+        })
+    }
+    
+})
+
+app.get('/api/siteinfo', auth, admin, async (req, res) => {
+
+    try {
+        const siteInfo = await SiteInfo.find({id: 1});
+        return res.status(200).json({
+            success: true,
+            siteInfo: siteInfo
+        })
+    } catch(error) {
+        return res.status(200).json({
+            success: false,
+            error
+        })
+    }
+    
 })
 
 // ============================

@@ -31,14 +31,15 @@ export const update = (element, formdata, formName ) => {
     }
     const newElement = {
         ...newFormdata[element.id]
-    }
+    }    
 
-    console.log(newElement,"NEW ELEMENT");
-    
-
-    newElement.value = element.event.target.value;
+    newElement.value = element.event.target.value;    
 
     if(element.blur){
+        let validData = validate(newElement,formdata);
+        newElement.valid = validData[0];
+        newElement.validationMessage = validData[1];
+    } else {
         let validData = validate(newElement,formdata);
         newElement.valid = validData[0];
         newElement.validationMessage = validData[1];
@@ -89,4 +90,38 @@ export const populateField = (oldFormData, arrayData=[], category) => {
 
     return newFormData;
     
+}
+
+export const resetFormData = (oldFormData) => {
+    let newFormData = {
+        ...oldFormData
+    };
+
+    for (let key in oldFormData) {
+        
+        if (key === 'image') {
+            newFormData[key].value = [];
+        } else {
+            newFormData[key].value = "";
+        }
+        
+        newFormData[key].valid = false;
+        newFormData[key].touched = false;
+        newFormData[key].validationMessage = "";
+    }
+
+    return newFormData;
+}
+
+export const populateUserInfo = (formData, fields) => {
+    
+    for(let key in formData){
+        formData[key].value = fields[key];
+        formData[key].valid = true;
+        formData[key].touched = true;
+        formData[key].validationMessage = ''
+    }
+
+    return formData;
+
 }

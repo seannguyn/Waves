@@ -1,5 +1,7 @@
 import React from 'react'
 import Card from '../Card/card'
+import CircularProgress from '@material-ui/core/CircularProgress';
+
 const CardShop = (props) => {
 
     const renderCards = (products) => (
@@ -10,7 +12,7 @@ const CardShop = (props) => {
                 {...card}
                 grid={props.grid}
             />
-        )) : null
+        )) : (<CircularProgress/>)
     )
 
     return (
