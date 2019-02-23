@@ -13,6 +13,7 @@ import Product from './components/Product';
 import Cart from './components/Cart';
 import UpdateProfile from './components/User/update_profile';
 import SiteInfo from './components/User/Admin/site_info'
+import NotFound from './components/NotFound';
 
 const Routes = () => {
   return (
@@ -23,6 +24,7 @@ const Routes = () => {
         <Route exact path="/admin/add_product" component={ProtectedRoute(AddProduct,true)}/>
         <Route exact path="/admin/manage_categories" component={ProtectedRoute(ManageCategories,true)}/>
         <Route exact path="/admin/site_info" component={ProtectedRoute(SiteInfo,true)}/>
+        
         <Route exact path="/" component={ProtectedRoute(Home,false,true)}/>
         <Route exact path="/shop" component={ProtectedRoute(Shop,false,true)}/>
 
@@ -32,6 +34,8 @@ const Routes = () => {
 
         <Route exact path="/register_login" component={ProtectedRoute(Auth,false)}/>
         <Route exact path="/register" component={ProtectedRoute(Register,false)}/>
+        <Route component={ProtectedRoute(NotFound,false)}/>
+
       </Switch>
     </Layout>
     

@@ -1,0 +1,20 @@
+findNthSmallest(int array[], int left, int right) {
+    if (k > 0 && k < right - left - 1) {
+        int position = partition(array, left, right);
+        if (position - left == k - 1) {
+            return array[position];
+        }
+        else if (position - left > k - 1) {
+            findNthSmallest(array, left, position-1,k);
+        } else {
+            findNthSmallest(array, position+1, right,k-position+left-1);
+        }
+    }
+    return integer.max;
+}
+
+partition(array,left,right) {
+    int pivot = array[right];
+    int i = left -1;
+    int j = 
+}

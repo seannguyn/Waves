@@ -9,7 +9,7 @@ const formidable = require('express-formidable');
 const cloudinary = require('cloudinary');
 const Helper = require('./helper');
 const asyncCall = require('async');
-
+var SHA256 = require("crypto-js/sha256");
 require('dotenv').config();
 
 // ============================
@@ -28,7 +28,7 @@ app.use(cookiesParser());
 // ============================
 mongoose.Promise = global.Promise
 mongoose
-.connect(process.env.DATABASE)
+.connect(process.env.DATABASE, { useNewUrlParser: true })
 .then(() =>{console.log("connected to mongo")})
 .catch((e) => console.log("ERROR: CANNOT CONNECT TO MONGO"))
 
@@ -47,6 +47,12 @@ const Wood = require('./models/wood');
 const Product = require('./models/product');
 const Payment = require('./models/payment');
 const SiteInfo = require('./models/siteinfo');
+
+// ============================
+// ====== UTILS SERVICE
+// ============================
+const sendMail = require('./utilsService/mailService/mailService');
+const utilsConstant = require('./utilsService/utilsConstant');
 
 // ============================
 // ====== ROUTE
@@ -69,7 +75,11 @@ app.post('/api/user/register', (req,res) => {
     const user = new User(req.body);
 
     user.save((error,doc) => {
+
         if(error) return res.json({success:false,error, userData:"error in registration"});
+
+        sendMail(user.email,utilsConstant.WELCOME_MAIL);
+
         return res.status(200).json({
             success: true,
             userData: doc,
@@ -214,6 +224,7 @@ app.post('/api/users/purchaseItem',auth, async (req,res) => {
     cartData.forEach( item => {
         history.push({
             dateOfPurchase: Date.now(),
+            porder: `PO-${Date.now()}#${SHA256("Message").toString().substring(0,8)}`,
             name: item.name,
             brand: item.brand.name,
             id: item._id,
@@ -227,8 +238,6 @@ app.post('/api/users/purchaseItem',auth, async (req,res) => {
     transactionData.paymentData = payment;
     transactionData.product = history
     
-    console.log(transactionData);
-
     try {
 
         const user = await User.findOneAndUpdate({_id:userId}, {
@@ -248,6 +257,9 @@ app.post('/api/users/purchaseItem',auth, async (req,res) => {
             },
             (err) => {
                 if (err) res.status(200).json({success: false,err});
+
+                // send email abt purchase order
+                sendMail(user.email,utilsConstant.PURCHASE_MAIL,history);
 
                 return res.status(200).json({
                     success: true,

@@ -12,7 +12,7 @@ const userLinks = [
     },
     {
         name: 'My Cart',
-        linkTo: '/user/cart'
+        linkTo: '/cart'
     },
 ]
 
