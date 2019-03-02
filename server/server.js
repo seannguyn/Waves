@@ -24,12 +24,16 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(cookiesParser());
 
+// PRODUCTION: HEROKU
+app.use(express.static('client/build'))
+// PRODUCTION: HEROKU
+
 // ============================
 // ====== DATABASE CONNECTION 
 // ============================
 mongoose.Promise = global.Promise
 mongoose
-.connect(process.env.DATABASE, { useNewUrlParser: true })
+.connect(process.env.MONGO_URI, { useNewUrlParser: true })
 .then(() =>{console.log("connected to mongo")})
 .catch((e) => console.log("ERROR: CANNOT CONNECT TO MONGO"))
 
@@ -672,6 +676,15 @@ app.get('/api/siteinfo', async (req, res) => {
     }
     
 })
+
+// PRODUCTION: HEROKU 
+if( process.env.NODE_ENV === 'production' ){
+    const path = require('path');
+    app.get('/*',(req,res)=>{
+        res.sendfile(path.resolve(__dirname,'../client','build','index.html'))
+    })
+}
+// PRODUCTION: HEROKU
 
 // ============================
 // ====== RUN APP 

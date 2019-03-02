@@ -24,3 +24,30 @@ payment: {
 
     }
 }
+
+Deployment instructions:
+
+heroku create 
+git push heroku
+heroku addons:<OPERATION, create> mongolab:sandbox
+heroku config (show all the environment variable)
+heroku confid:set KEY1=VAL1 KEY2=VAL2 KEY3=VAL3
+
+(server will render the build of the client app,)
+heroku-prebuild: (run before installation)
+heroku-postbuild: (run after installation, before deployment to production)
+
+
+
+STEP 1: ADD to package.json
+    engines: {
+        node: ...
+    }
+
+STEP 2: LINK MONGO (optional)
+
+STEP3 : ADD to package.json script:
+    heroku-postbuild:"NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+
+STEP 4: ADD DEFAULT ROUTE
+    app.use(express.static('client/build'))
