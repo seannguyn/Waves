@@ -13,7 +13,7 @@ class ProductImages extends Component {
     
     renderPrimaryImage = (images) => {
         if(images.length > 0){
-            return images[0].url
+            return images[0]
         }else{
             return `/images/image_not_availble.png`
         }
@@ -27,7 +27,7 @@ class ProductImages extends Component {
                     key={i}
                     onClick={()=> this.handleLightBox(i)}
                     className="thumb"
-                    style={{background: `url(${item.url}) no-repeat`}}
+                    style={{background: `url(${item}) no-repeat`}}
                 ></div> 
                 : null
         ))

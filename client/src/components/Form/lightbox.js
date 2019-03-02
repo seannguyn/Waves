@@ -13,7 +13,7 @@ class ImageLightBox extends Component {
         if (props.images.length > 0) {
             const images = [];
             props.images.forEach(element=>{
-                images.push({src:`${element.url}`})
+                images.push({src:`${element}`})
             });
             return state = {
                 images
