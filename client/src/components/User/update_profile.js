@@ -87,8 +87,7 @@ class UpdateProfile extends Component {
                         formSuccess: false
                     })
                 }
-            })
-            
+            }) 
         } else {
             this.setState({
                 formError: true

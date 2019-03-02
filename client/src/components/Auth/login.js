@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import FormField from '../Form/formfield';
 import { update, generateData, isFormValid } from '../Form/formActions';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Link } from 'react-router-dom';
 
 import { loginUser } from '../../reduxActions/userActions';
 
@@ -113,6 +113,12 @@ class Login extends Component {
                     <button onClick={(event)=> this.submitForm(event)}>
                         Log in
                     </button>
+                    <Link to="/resetpassword">
+                        <button>
+                            Forgot Password ?
+                        </button>
+                    </Link>
+                    
 
 
                 </form>

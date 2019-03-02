@@ -14,6 +14,8 @@ import Cart from './components/Cart';
 import UpdateProfile from './components/User/update_profile';
 import SiteInfo from './components/User/Admin/site_info'
 import NotFound from './components/NotFound';
+import ResetPassword from './components/Auth/reset_password';
+import ChangePassword from './components/Auth/change_password';
 
 const Routes = () => {
   return (
@@ -34,6 +36,8 @@ const Routes = () => {
 
         <Route exact path="/register_login" component={ProtectedRoute(Auth,false)}/>
         <Route exact path="/register" component={ProtectedRoute(Register,false)}/>
+        <Route exact path="/resetpassword" component={ProtectedRoute(ResetPassword,false)}/>
+        <Route exact path="/change_password/:resetToken" component={ProtectedRoute(ChangePassword,false)}/>
         <Route component={ProtectedRoute(NotFound,false)}/>
 
       </Switch>

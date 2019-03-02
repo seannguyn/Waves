@@ -17,6 +17,7 @@ require('dotenv').config();
 // ============================
 const {auth} = require('./middlewares/auth');
 const {admin} = require('./middlewares/admin');
+const {resetTokenValidation} = require('./middlewares/resetTokenValidation')
 const app = express();
 
 app.use(bodyParser.urlencoded({extended:true}));
@@ -148,6 +149,81 @@ app.get('/api/user/logout',auth ,(req,res) => {
     
 })
 
+app.post('/api/user/resetPasswordToken',async (req,res) => {
+    const user = await User.findOne({email: req.body.email});
+    if (user) {
+        try {
+            const resetToken = await user.generateResetToken();
+
+            // send email abt resetting password
+            sendMail(user.email,utilsConstant.RESET_PASSWORD,resetToken);
+            
+            return res.status(200).json({success:true});
+        }
+        catch (e) {
+            console.log(e);
+            return res.status(200).json({success:false, error: "something wrong with server"});
+        }
+    } else {
+        return res.status(200).json({success:false});
+    }
+})
+
+app.get('/api/user/resetPassword/:resetToken',async (req,res) => {
+
+    try {
+        const user = await User.findOne({"resetToken.token": req.params.resetToken});
+        if (user) {
+            if (user.checkResetTokenTimeStamp() !== true) {
+                user.resetToken.token = "";
+                user.resetToken.time = "";
+                await user.save();
+                return res.status(200).json({success:false, errorMsg: "Expired TOKEN"});
+            } else {
+                return res.status(200).json({success:true, _id: user._id}); 
+            }
+            // return res.status(200).json({success:true, _id: user._id});
+        } else {
+            return res.status(200).json({success:false, errorMsg: "No email found"});
+        }
+    } catch(e) {
+        console.log(e);
+        return res.status(200).json({success:false, errorMsg: "something wrong with server"});
+    }
+
+})
+
+app.post('/api/users/resetPassword',resetTokenValidation, async (req,res) => {
+    try {
+
+        const {_id,password} = req.body;
+
+        const user = await User.findOne({_id: _id});        
+
+        user.password = password;
+        user.resetToken.token="";
+        user.resetToken.time="";
+        await user.save();
+
+        // await User.findOneAndUpdate({},{
+        //     password,
+        //     "resetToken.token": "",
+        //     "resetToken.time": ""
+        // },{new:false});
+
+        return res.status(200).json({
+            success: true,
+        })
+
+    } catch(error) {
+        console.log("error",error);
+        
+        return res.status(200).json({
+            success: false,
+        })
+    }
+})
+
 app.post('/api/users/addToCart',auth, async (req,res)=>{
 
     // merge cart
@@ -176,12 +252,10 @@ app.post('/api/users/addToCart',auth, async (req,res)=>{
 
 app.post('/api/users/updateProfile',auth, async (req,res) => {
     try {
-        const {firstName,lastName,email,_id} = req.body;
+        const {_id} = req.body;
 
         const user = await User.findOneAndUpdate({_id: _id},{
-            email,
-            firstName,
-            lastName,
+            ...req.body,
         },{new:true});
 
         return res.status(200).json({
@@ -582,7 +656,7 @@ app.post('/api/siteinfo', auth, admin, async (req, res) => {
     
 })
 
-app.get('/api/siteinfo', auth, admin, async (req, res) => {
+app.get('/api/siteinfo', async (req, res) => {
 
     try {
         const siteInfo = await SiteInfo.find({id: 1});

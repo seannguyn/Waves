@@ -2,11 +2,12 @@
 const mailer = require("nodemailer");
 const welcomeTemplate = require('./welcome_template');
 const purchaseTemplate = require('./purchase_template');
+const resetPass = require('./resetpass_template');
 const utilsConstant = require('../utilsConstant');
 
 require('dotenv').config();
 
-const getMailData = (to, type, history=[]) => {
+const getMailData = (to, type, data=null) => {
 
     var mailOptions = {
         from: `Waves Guitar <${process.env.SERVER_MAIL_ID}>`, // sender address
@@ -24,7 +25,13 @@ const getMailData = (to, type, history=[]) => {
             return {
                 ...mailOptions,
                 subject: 'Thank you for shopping with Waves',
-                html: purchaseTemplate(history),
+                html: purchaseTemplate(data),
+            }
+        case utilsConstant.RESET_PASSWORD:
+            return {
+                ...mailOptions,
+                subject: 'Reset You Password',
+                html: resetPass(data),
             }
         default:
             return {

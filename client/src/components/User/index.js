@@ -18,7 +18,7 @@ class UserDashboard extends Component {
                         <MyButton
                             type="default"
                             title="Edit account info"
-                            linkTo="/user/user_profile"
+                            linkTo="/user/update_profile"
                         />
                     </div>
 

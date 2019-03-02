@@ -2,6 +2,8 @@ const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs')
 const Schema = mongoose.Schema
 const JWT = require('jsonwebtoken')
+const uuidv4 = require('uuid/v4');
+
 require('dotenv').config();
 
 // create schema
@@ -41,6 +43,16 @@ const UserSchema = new Schema({
     token:{
         type:String,
         default:""
+    },
+    resetToken: {
+        token: {
+            type:String,
+            default:""
+        },
+        time: {
+            type:String,
+            default:""
+        }
     }
 })
 // function that is called before data is saved on DB
@@ -72,6 +84,20 @@ UserSchema.methods.isValidPassword = async function(newPassword,hashPW) {
 }
 
 // models methods
+UserSchema.methods.checkResetTokenTimeStamp = function() {
+    try {
+        const now = new Date().getTime();
+        console.log(now,"now exp",this.resetToken.time);
+        console.log(now < this.resetToken.time);
+        
+        // return now < this.resetToken.time;
+        return true
+    } catch(error) {
+        throw new Error(error)
+    }
+}
+
+// models methods
 UserSchema.methods.generateToken = async function(cart=[]) {
     try {
 
@@ -87,6 +113,25 @@ UserSchema.methods.generateToken = async function(cart=[]) {
         await this.save()
 
         return this;
+    
+    } catch(error) {
+        throw new Error(error)
+    }
+}
+
+// models methods
+UserSchema.methods.generateResetToken = async function() {
+    try {
+
+        const newResetToken = uuidv4();
+        const exp = new Date().getTime() + 60*60*3; // current date + 1
+
+        this.resetToken.token = newResetToken;
+        this.resetToken.time = exp;
+
+        await this.save()
+
+        return newResetToken;
     
     } catch(error) {
         throw new Error(error)

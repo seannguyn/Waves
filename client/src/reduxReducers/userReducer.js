@@ -8,6 +8,7 @@ import {
     SERVER_REMOVE_CART,
     USER_PURCHASE_ITEM,
     UPDATE_PROFILE,
+    RESET_PASSWORD
 } from '../reduxActions/types';
 
 const initialState = {success:false};
@@ -50,7 +51,8 @@ export default function(state = initialState, action) {
 
     case UPDATE_PROFILE:
         return { ...state, success: action.payload.success, user: action.payload.userData }
-        
+    case RESET_PASSWORD:
+        return state;
     default:
       return state;
   }

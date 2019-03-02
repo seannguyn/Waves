@@ -4,6 +4,7 @@ export const AUTH_USER = 'auth_user';
 export const LOGOUT_USER = 'logout_user';
 export const USER_PURCHASE_ITEM = 'user_purchase_item';
 export const UPDATE_PROFILE = 'update_profile';
+export const RESET_PASSWORD = 'reset_password';
 
 export const GET_PRODUCT_BY_ARRIVAL = 'get_product_by_arrival';
 export const GET_PRODUCT_BY_SELL = 'get_product_by_sell';

@@ -8,7 +8,8 @@ import {
     SERVER_ADD_CART,
     SERVER_REMOVE_CART,
     USER_PURCHASE_ITEM,
-    UPDATE_PROFILE
+    UPDATE_PROFILE,
+    RESET_PASSWORD,
 } from './types';
 
 // import {clearCartLocalStorage} from './localCartActions';
@@ -140,4 +141,13 @@ export async function updateUserProfile(submitData) {
         type: UPDATE_PROFILE,
         payload: request.data
     }
-}   
+} 
+
+export async function resetPassword(submitData) {
+    const request = await axios.post('/api/users/resetPassword',submitData);
+
+    return {
+        type: RESET_PASSWORD,
+        payload: request.data
+    }
+} 
